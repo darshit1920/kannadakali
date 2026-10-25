@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>KannadaKali – Learn Kannada by Living It</title>
+<meta name="description" content="Learn practical Kannada through real-life situations, with voice playback, quizzes and pronunciation practice.">
+<style>
+:root{--bg:#fff8e7;--card:#fff;--ink:#2b1d0e;--mute:#6f5f4a;--red:#b71c1c;--gold:#f9a825;--ok:#2e7d32;--bad:#c62828;--line:#eadfc8;color-scheme:light}
+@media(prefers-color-scheme:dark){:root{--bg:#1c1610;--card:#2a2118;--ink:#f6ecd9;--mute:#c9b99d;--red:#ff7a6e;--gold:#ffc83d;--ok:#7bd981;--bad:#ff8a80;--line:#42352a;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Kannada",sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.wrap{max-width:720px;margin:0 auto;padding:16px}
+header{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.brand{font-weight:800;font-size:22px}.brand span{color:var(--red)}.brand small{display:block;font-size:13px;font-weight:500;color:var(--mute)}
+.stats{display:flex;gap:8px}.pill{background:var(--card);border:1px solid var(--line);border-radius:99px;padding:4px 12px;font-weight:700;font-size:14px}
+nav{display:flex;gap:6px;margin:16px 0}
+nav button{flex:1;padding:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;font:inherit;font-weight:700;cursor:pointer}
+nav button.on{background:var(--red);color:#fff;border-color:var(--red)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+.chip{flex:none;padding:8px 14px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;cursor:pointer}
+.chip.on{background:var(--gold);border-color:var(--gold);color:#2b1d0e;font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0}
+.kn{font-size:28px;font-weight:700;line-height:1.3}.rom{color:var(--red);font-weight:600}.en{color:var(--mute)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn{padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
+.btn.pri{background:var(--red);border-color:var(--red);color:#fff}.btn.done{background:var(--ok);border-color:var(--ok);color:#fff}
+.bar{height:8px;background:var(--line);border-radius:9px;overflow:hidden;margin:8px 0 4px}.bar i{display:block;height:100%;background:var(--ok)}
+.opt{display:block;width:100%;text-align:left;margin:8px 0;padding:12px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:inherit;cursor:pointer}
+.opt.ok{border-color:var(--ok)}.opt.no{border-color:var(--bad)}
+.note{font-size:14px;color:var(--mute)}.big{font-size:44px;text-align:center}
+label.t{display:flex;gap:8px;align-items:center;margin:8px 0;font-size:14px;color:var(--mute)}
+footer{text-align:center;font-size:13px;color:var(--mute);margin:24px 0 8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <div class="brand">ಕನ್ನಡ ಕಲಿ · Kannada<span>Kali</span><small>Learn Kannada by living it</small></div>
+ <div class="stats"><div class="pill" id="streak"></div><div class="pill" id="xp"></div></div>
+</header>
+<nav id="nav"></nav>
+<main id="view"></main>
+<footer>Built for the Kannada Digital Innovation Hackathon 2026 · Code. Create. Celebrate Kannada.</footer>
+</div>
+<script>
+const S=[
+{t:"Auto & Travel",e:"🛺",p:[["ಇಲ್ಲಿಗೆ ಎಷ್ಟು?","Illige eshtu?","How much to go here?"],["ಮೀಟರ್ ಹಾಕಿ","Meter haaki","Please use the meter"],["ಇಲ್ಲಿ ನಿಲ್ಲಿಸಿ","Illi nillisi","Stop here"],["ಬಲಕ್ಕೆ ತಿರುಗಿ","Balakke thirugi","Turn right"],["ಎಡಕ್ಕೆ ತಿರುಗಿ","Edakke thirugi","Turn left"],["ನೇರವಾಗಿ ಹೋಗಿ","Neravaagi hogi","Go straight"]]},
+{t:"Market",e:"🛒",p:[["ಇದರ ಬೆಲೆ ಎಷ್ಟು?","Idara bele eshtu?","What is the price of this?"],["ಸ್ವಲ್ಪ ಕಡಿಮೆ ಮಾಡಿ","Swalpa kadime maadi","Please reduce it a little"],["ಒಂದು ಕಿಲೋ ಕೊಡಿ","Ondu kilo kodi","Give me one kilo"],["ಇದು ಬೇಡ","Idu beda","I don’t want this"],["ಧನ್ಯವಾದಗಳು","Dhanyavaadagalu","Thank you"]]},
+{t:"Restaurant",e:"☕",p:[["ಒಂದು ಕಾಫಿ ಕೊಡಿ","Ondu kaaphi kodi","One coffee, please"],["ನೀರು ಬೇಕು","Neeru beku","I need water"],["ಖಾರ ಕಡಿಮೆ ಇರಲಿ","Khaara kadime irali","Less spicy, please"],["ಬಿಲ್ ಕೊಡಿ","Bill kodi","Bill, please"],["ತುಂಬಾ ರುಚಿಯಾಗಿದೆ","Tumba ruchiyaagide","It is very tasty"]]},
+{t:"Hospital",e:"🏥",p:[["ನನಗೆ ಜ್ವರ ಇದೆ","Nanage jvara ide","I have a fever"],["ನನಗೆ ತಲೆನೋವು ಇದೆ","Nanage talenovu ide","I have a headache"],["ವೈದ್ಯರನ್ನು ಕರೆಯಿರಿ","Vaidyarannu kareyiri","Please call the doctor"],["ಔಷಧಿ ಎಲ್ಲಿ ಸಿಗುತ್ತದೆ?","Aushadhi elli siguttade?","Where can I get medicine?"]]},
+{t:"Bus & Metro",e:"🚇",p:[["ಮೆಟ್ರೋ ಸ್ಟೇಷನ್ ಎಲ್ಲಿದೆ?","Metro station ellide?","Where is the metro station?"],["ಬಸ್ ಯಾವಾಗ ಬರುತ್ತದೆ?","Bus yaavaaga baruttade?","When will the bus come?"],["ಇದು ಎಲ್ಲಿಗೆ ಹೋಗುತ್ತದೆ?","Idu ellige hoguttade?","Where does this go?"]]},
+{t:"Workplace",e:"💼",p:[["ನಮಸ್ಕಾರ","Namaskara","Hello"],["ನಿಮ್ಮ ಹೆಸರೇನು?","Nimma hesarenu?","What is your name?"],["ನನಗೆ ಕನ್ನಡ ಸ್ವಲ್ಪ ಸ್ವಲ್ಪ ಬರುತ್ತದೆ","Nanage Kannada swalpa swalpa baruttade","I know a little Kannada"],["ದಯವಿಟ್ಟು ನಿಧಾನವಾಗಿ ಮಾತನಾಡಿ","Dayavittu nidhaanavaagi maatanaadi","Please speak slowly"],["ಅರ್ಥವಾಗಲಿಲ್ಲ","Arthavaagalilla","I did not understand"]]}
+];
+const ALL=S.flatMap((s,si)=>s.p.map((p,i)=>({kn:p[0],rom:p[1],en:p[2],id:si+"-"+i,si})));
+const today=()=>new Date().toISOString().slice(0,10);
+let st={rom:true,xp:0,learned:{},streak:0,last:""};
+try{Object.assign(st,JSON.parse(localStorage.getItem("kk")||"{}"))}catch(e){}
+const save=()=>{try{localStorage.setItem("kk",JSON.stringify(st))}catch(e){}};
+let tab="learn",scene=0,q=null,sp={i:0,res:null,on:false,err:""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function addXp(n){st.xp+=n;const t=today();if(st.last!==t){const y=new Date(Date.now()-864e5).toISOString().slice(0,10);st.streak=st.last===y?st.streak+1:1;st.last=t}save()}
+let voices=[];const loadV=()=>{voices=window.speechSynthesis?speechSynthesis.getVoices():[]};
+if(window.speechSynthesis){loadV();speechSynthesis.onvoiceschanged=loadV}
+const hasKn=()=>voices.some(v=>/^kn/i.test(v.lang));
+function say(t){if(!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="kn-IN";const v=voices.find(v=>/^kn/i.test(v.lang));if(v)u.voice=v;u.rate=.85;speechSynthesis.speak(u)}
+const find=id=>ALL.find(x=>x.id===id);
+const cur=()=>{const l=S[scene].p;return {...ALL.find(x=>x.id===scene+"-"+(sp.i%l.length))}};
+function lev(a,b){const d=Array.from({length:a.length+1},(_,i)=>[i]);for(let j=1;j<=b.length;j++)d[0][j]=j;for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[a.length][b.length]}
+const norm=s=>s.toLowerCase().replace(/[\s.,?!।]/g,"");
+const sim=(a,b)=>{a=norm(a);b=norm(b);return Math.max(0,1-lev(a,b)/Math.max(a.length,b.length,1))};
+function newQuiz(all){const pool=all?ALL:ALL.filter(x=>x.si===scene);q={all,i:0,score:0,pick:null,done:false,items:shuffle(pool).slice(0,5).map(c=>({c,opts:shuffle([c,...shuffle(ALL.filter(x=>x.id!==c.id)).slice(0,3)])}))}}
+const romLine=r=>st.rom?`<div class="rom">${esc(r)}</div>`:"";
+function learnV(){const l=S[scene].p,n=l.filter((_,i)=>st.learned[scene+"-"+i]).length;
+return `<div class="chips">${S.map((s,i)=>`<button class="chip ${i===scene?"on":""}" data-a="scene" data-v="${i}">${s.e} ${s.t}</button>`).join("")}</div>
+<label class="t"><input type="checkbox" data-a="rom" ${st.rom?"checked":""}> Show English-letter pronunciation</label>
+<div class="bar"><i style="width:${n/l.length*100}%"></i></div><div class="note">${n} of ${l.length} phrases learned in this scene</div>
+${l.map((p,i)=>{const id=scene+"-"+i,d=st.learned[id];return `<div class="card"><div class="kn">${p[0]}</div>${romLine(p[1])}<div class="en">${esc(p[2])}</div>
+<div class="row"><button class="btn" data-a="say" data-v="${id}">🔊 Listen</button><button class="btn ${d?"done":""}" data-a="learn" data-v="${id}">${d?"✓ Learned":"Mark as learned (+5)"}</button></div></div>`}).join("")}
+${window.speechSynthesis&&!hasKn()?`<p class="note">Tip: no Kannada voice was found on this device. Add one in your system’s language or text-to-speech settings for natural audio.</p>`:""}`}
+function quizV(){if(!q)return `<div class="card"><div class="big">🎯</div><h3>Quick quiz</h3><p>Pick the right Kannada phrase for each English meaning. 5 questions, +10 XP per correct answer.</p>
+<div class="row"><button class="btn pri" data-a="qs" data-v="0">Quiz: ${S[scene].t}</button><button class="btn" data-a="qs" data-v="1">Mix all scenes</button></div></div>`;
+if(q.done)return `<div class="card"><div class="big">${q.score>=4?"🎉":"💪"}</div><h3 style="text-align:center">You scored ${q.score} / ${q.items.length}</h3><p class="note" style="text-align:center">+${q.score*10} XP earned. Practice makes it stick!</p><div class="row" style="justify-content:center"><button class="btn pri" data-a="qs" data-v="${q.all?1:0}">Try again</button><button class="btn" data-a="qx">Back</button></div></div>`;
+const it=q.items[q.i];return `<div class="note">Question ${q.i+1} of ${q.items.length}</div><div class="bar"><i style="width:${q.i/q.items.length*100}%"></i></div>
+<div class="card"><div class="note">How do you say:</div><div style="font-size:22px;font-weight:700">${esc(it.c.en)}</div>
+${it.opts.map((o,i)=>{let c="";if(q.pick!==null){if(o.id===it.c.id)c="ok";else if(i===q.pick)c="no"}return `<button class="opt ${c}" data-a="qp" data-v="${i}"><span class="kn" style="font-size:22px">${o.kn}</span>${romLine(o.rom)}</button>`}).join("")}
+${q.pick!==null?`<div class="row"><button class="btn" data-a="say" data-v="${it.c.id}">🔊 Hear it</button><button class="btn pri" data-a="qn">${q.i+1<q.items.length?"Next":"See score"}</button></div>`:""}</div>`}
+function speakV(){const p=cur();const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+return `<div class="chips">${S.map((s,i)=>`<button class="chip ${i===scene?"on":""}" data-a="scene" data-v="${i}">${s.e} ${s.t}</button>`).join("")}</div>
+<div class="card"><div class="note">Say this phrase out loud:</div><div class="kn">${p.kn}</div>${romLine(p.rom)}<div class="en">${esc(p.en)}</div>
+<div class="row"><button class="btn" data-a="say" data-v="${p.id}">🔊 Listen first</button><button class="btn pri" data-a="mic" ${sp.on?"disabled":""}>${sp.on?"Listening…":"🎤 Speak now"}</button></div>
+<div class="row"><button class="btn" data-a="sp" data-v="-1">← Previous</button><button class="btn" data-a="sp" data-v="1">Next →</button></div>
+${sp.res?`<div class="card" style="margin-bottom:0"><div class="note">We heard:</div><div class="kn" style="font-size:22px">${esc(sp.res.t)}</div><b style="color:var(--${sp.res.s>=.7?"ok":"bad"})">${Math.round(sp.res.s*100)}% match · ${sp.res.s>=.7?"Great pronunciation! +15 XP":"Close. Listen again and retry."}</b></div>`:""}
+${sp.err?`<p class="note">Microphone or recognition problem (${esc(sp.err)}). Check permissions and try again.</p>`:""}
+${!SR?`<p class="note">Voice recognition needs Chrome or Edge. You can still use Listen and repeat aloud.</p>`:""}</div>`}
+function render(){document.getElementById("streak").textContent="🔥 "+st.streak;document.getElementById("xp").textContent="⭐ "+st.xp+" XP";
+document.getElementById("nav").innerHTML=[["learn","📖 Learn"],["quiz","🎯 Quiz"],["speak","🎤 Speak"]].map(([k,l])=>`<button class="${k===tab?"on":""}" data-a="tab" data-v="${k}">${l}</button>`).join("");
+document.getElementById("view").innerHTML=tab==="learn"?learnV():tab==="quiz"?quizV():speakV()}
+function mic(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){sp.err="unsupported";return render()}
+const r=new SR();r.lang="kn-IN";r.interimResults=false;r.maxAlternatives=3;sp={...sp,on:true,res:null,err:""};render();const target=cur().kn;
+r.onresult=e=>{let best={t:"",s:-1};for(const a of e.results[0]){const s=sim(a.transcript,target);if(s>best.s)best={t:a.transcript,s}}sp.res=best;if(best.s>=.7)addXp(15)};
+r.onerror=e=>{sp.err=e.error};r.onend=()=>{sp.on=false;render()};try{r.start()}catch(e){sp.on=false;sp.err="start failed";render()}}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a,v=b.dataset.v;if(a==="rom")return;
+if(a==="tab"){tab=v}else if(a==="scene"){scene=+v;sp={i:0,res:null,on:false,err:""};q=null}
+else if(a==="say"){say(find(v).kn);return}
+else if(a==="learn"){if(!st.learned[v]){st.learned[v]=1;addXp(5)}else delete st.learned[v];save()}
+else if(a==="qs"){newQuiz(v==="1")}else if(a==="qx"){q=null}
+else if(a==="qp"){if(q.pick===null){q.pick=+v;const it=q.items[q.i];if(it.opts[+v].id===it.c.id){q.score++;addXp(10)}}}
+else if(a==="qn"){q.pick=null;if(++q.i>=q.items.length)q.done=true}
+else if(a==="sp"){sp={i:(sp.i+ +v+S[scene].p.length)%S[scene].p.length,res:null,on:false,err:""}}
+else if(a==="mic"){mic();return}render()});
+document.addEventListener("change",e=>{if(e.target.dataset.a==="rom"){st.rom=e.target.checked;save();render()}});
+render();
+</script>
+</body>
+</html>
